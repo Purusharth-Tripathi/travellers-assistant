@@ -1,0 +1,218 @@
+/* Custom styles for Traveller's Assistant */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Smooth transitions */
+.transition {
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Form styling enhancements */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* Loading animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    header p {
+        font-size: 0.875rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    header,
+    footer,
+    #inputSection,
+    #newPlanBtn,
+    button {
+        display: none !important;
+    }
+    
+    #resultsSection {
+        display: block !important;
+    }
+    
+    .shadow-md,
+    .shadow-lg {
+        box-shadow: none !important;
+    }
+}
+
+/* Prose styling for advice content */
+.prose {
+    color: #374151;
+}
+
+.prose strong {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.prose p {
+    margin-bottom: 1rem;
+}
+
+.prose ul,
+.prose ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.prose li {
+    margin-bottom: 0.5rem;
+}
+
+/* Card hover effects */
+.bg-white {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bg-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Button ripple effect */
+button {
+    position: relative;
+    overflow: hidden;
+}
+
+button:active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    to {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+
+/* Weather card animations */
+.bg-blue-50 {
+    transition: all 0.3s ease;
+}
+
+.bg-blue-50:hover {
+    background-color: #dbeafe;
+    transform: scale(1.05);
+}
+
+/* Section reveal animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#resultsSection > div {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+#resultsSection > div:nth-child(2) { animation-delay: 0.1s; }
+#resultsSection > div:nth-child(3) { animation-delay: 0.2s; }
+#resultsSection > div:nth-child(4) { animation-delay: 0.3s; }
+
+/* Mobile menu improvements */
+@media (max-width: 768px) {
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    /* Uncomment to enable dark mode */
+    /*
+    body {
+        background-color: #1f2937;
+        color: #f3f4f6;
+    }
+    
+    .bg-white {
+        background-color: #374151;
+    }
+    
+    .text-gray-800 {
+        color: #f3f4f6;
+    }
+    
+    .text-gray-600 {
+        color: #d1d5db;
+    }
+    */
+}
