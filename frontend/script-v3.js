@@ -1,6 +1,6 @@
 // Frontend JavaScript for Traveller's Assistant
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://travellers-assistant.onrender.com/api';
 
 // Elements
 const travelForm = document.getElementById('travelForm');

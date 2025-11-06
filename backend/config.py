@@ -11,7 +11,7 @@ class Config:
     
     # Flask
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    DEBUG = os.getenv('FLASK_DEBUG', 'True') == 'True'
+    DEBUG = os.getenv('FLASK_DEBUG', 'False') == 'True'
     PORT = int(os.getenv('PORT', 5000))
     
     # API Keys
