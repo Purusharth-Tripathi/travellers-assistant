@@ -3,16 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="AI-powered travel planning companion. Get personalized travel advice, weather forecasts, and cultural insights.">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TravelAssist">
+
     <title>Traveller's Assistant</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- App Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
     <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-4 shadow-lg">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl md:text-3xl font-bold">✈️ Traveller's Assistant</h1>
-            <p class="text-sm md:text-base text-blue-100 mt-1">Your AI-powered travel planning companion</p>
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold">✈️ Traveller's Assistant</h1>
+                <p class="text-sm md:text-base text-blue-100 mt-1">Your AI-powered travel planning companion</p>
+            </div>
+            <!-- Install App Button -->
+            <button id="installButton" class="hidden bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition">
+                📱 Install App
+            </button>
         </div>
     </header>
 
@@ -298,5 +322,47 @@
     </footer>
 
     <script src="script-v3.js?v=6.1"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+
+        // Install prompt for PWA
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install button
+            installButton.classList.remove('hidden');
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response: ${outcome}`);
+                deferredPrompt = null;
+                installButton.classList.add('hidden');
+            }
+        });
+
+        // Hide button after app is installed
+        window.addEventListener('appinstalled', () => {
+            installButton.classList.add('hidden');
+            console.log('PWA installed successfully!');
+        });
+    </script>
 </body>
 </html>
