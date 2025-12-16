@@ -1,22 +1,24 @@
 """
-AI Service (using Google Gemini)
-Handles all interactions with Google's Gemini API
+AI Service (using Anthropic Claude)
+Handles all interactions with Anthropic's Claude API
 """
-import google.generativeai as genai
+from anthropic import Anthropic
 from config import Config
 import logging
+import httpx
 
 logger = logging.getLogger(__name__)
 
 class ClaudeService:
-    """Service for interacting with AI (now using Google Gemini)"""
+    """Service for interacting with Anthropic Claude AI"""
 
     def __init__(self):
-        # Configure Gemini API
-        genai.configure(api_key=Config.GEMINI_API_KEY)
+        # Configure Anthropic API with SSL verification disabled (corporate environment workaround)
+        http_client = httpx.Client(verify=False)
+        self.client = Anthropic(api_key=Config.ANTHROPIC_API_KEY, http_client=http_client)
 
-        # Use Gemini 2.0 Flash (fast and free)
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
+        # Use Claude 3 Haiku (fast and cost-effective)
+        self.model = "claude-3-haiku-20240307"
 
     def generate_travel_advice(self, user_input, weather_data, country_data):
         """
@@ -35,10 +37,16 @@ class ClaudeService:
         try:
             logger.info(f"Generating travel advice for {user_input.get('destination')}")
 
-            # Generate content using Gemini
-            response = self.model.generate_content(prompt)
+            # Generate content using Claude
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=4000,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
 
-            response_text = response.text
+            response_text = response.content[0].text
 
             # Parse the response into structured sections
             advice = self._parse_advice_response(response_text)
@@ -54,7 +62,7 @@ class ClaudeService:
             raise
 
     def _build_travel_prompt(self, user_input, weather_data, country_data):
-        """Build the prompt for Gemini"""
+        """Build the prompt for Claude"""
 
         destination = user_input.get('destination', '')
         dates = user_input.get('dates', {})

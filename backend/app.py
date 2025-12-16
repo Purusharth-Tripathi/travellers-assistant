@@ -49,7 +49,7 @@ def validate_config():
             'valid': True,
             'message': 'Configuration is valid',
             'apis': {
-                'gemini': bool(Config.GEMINI_API_KEY),
+                'anthropic': bool(Config.ANTHROPIC_API_KEY),
                 'openweather': bool(Config.OPENWEATHER_API_KEY),
                 'exchangerate': bool(Config.EXCHANGE_RATE_API_KEY),
                 'google_places': bool(Config.GOOGLE_PLACES_API_KEY)
@@ -204,9 +204,15 @@ They have a question: {question}
 
 Please provide a helpful, practical, and specific answer. Keep it concise (2-4 sentences) but informative."""
 
-        # Get answer from AI
-        response = claude_service.model.generate_content(prompt)
-        answer = response.text
+        # Get answer from AI using Claude
+        response = claude_service.client.messages.create(
+            model=claude_service.model,
+            max_tokens=1000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        answer = response.content[0].text
 
         logger.info("Question answered successfully")
         return jsonify({

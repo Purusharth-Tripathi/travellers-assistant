@@ -15,6 +15,7 @@ class Config:
     PORT = int(os.getenv('PORT', 5000))
     
     # API Keys
+    ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
     OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
     EXCHANGE_RATE_API_KEY = os.getenv('EXCHANGE_RATE_API_KEY')
@@ -35,8 +36,8 @@ class Config:
         """Validate that essential configuration is present"""
         missing = []
 
-        if not Config.GEMINI_API_KEY:
-            missing.append('GEMINI_API_KEY')
+        if not Config.ANTHROPIC_API_KEY:
+            missing.append('ANTHROPIC_API_KEY')
         if not Config.OPENWEATHER_API_KEY:
             missing.append('OPENWEATHER_API_KEY')
 
