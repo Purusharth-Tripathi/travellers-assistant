@@ -1,6 +1,9 @@
 // Frontend JavaScript for Traveller's Assistant
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Auto-detect API base URL based on environment
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/api'
+    : `${window.location.origin}/api`;
 
 // Elements
 const travelForm = document.getElementById('travelForm');
