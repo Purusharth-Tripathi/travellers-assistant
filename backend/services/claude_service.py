@@ -9,6 +9,21 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
+# Worldstandards.eu uses idiosyncratic slugs for some countries — natural
+# slugifications of the long-form names 404. Maps the slug we'd otherwise
+# produce to the slug the site actually serves.
+_POWER_PLUG_SLUG_ALIASES = {
+    'united-kingdom': 'uk',
+    'united-states': 'usa',
+    'united-states-of-america': 'usa',
+    'czech-republic': 'czechia',
+    'cote-divoire': 'ivory-coast',
+    'trinidad-and-tobago': 'trinidad-tobago',
+    'democratic-republic-of-the-congo': 'congo-kinshasa',
+    'burma': 'myanmar',
+}
+
+
 class ClaudeService:
     """Service for interacting with Anthropic Claude AI"""
 
@@ -17,8 +32,8 @@ class ClaudeService:
         http_client = httpx.Client(verify=False)
         self.client = Anthropic(api_key=Config.ANTHROPIC_API_KEY, http_client=http_client)
 
-        # Use Claude 3 Haiku (fast and cost-effective)
-        self.model = "claude-3-haiku-20240307"
+        # Use Claude Haiku 4.5 (fast and cost-effective)
+        self.model = "claude-haiku-4-5"
 
     def generate_travel_advice(self, user_input, weather_data, country_data):
         """
@@ -40,7 +55,7 @@ class ClaudeService:
             # Generate content using Claude
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=4000,
+                max_tokens=12000,
                 messages=[
                     {"role": "user", "content": prompt}
                 ]
@@ -52,7 +67,9 @@ class ClaudeService:
             advice = self._parse_advice_response(response_text)
 
             # Add power adapter information with images
-            advice['power_adapter'] = self._get_power_adapter_info(country_data, response_text)
+            advice['power_adapter'] = self._get_power_adapter_info(
+                country_data, response_text, user_input.get('destination')
+            )
 
             logger.info("Travel advice generated successfully")
             return advice
@@ -101,7 +118,13 @@ COUNTRY INFORMATION:
 SPECIFIC QUESTIONS:
 {specific_questions if specific_questions else 'None'}
 
-Please provide detailed advice in the following sections. Use clear headers and bullet points:
+Provide concise, scannable advice across ALL 10 sections below. Critical requirements:
+- Use short bullet points, not prose paragraphs.
+- Aim for ~200 words per section. Do not exceed 300.
+- Cover EVERY section — sections 7-10 (Practical Info, Packing, Safety, Specific Answers) are as important as 1-6. Budget your output so you reach them.
+- Skip throat-clearing and obvious context; jump straight to actionable points.
+
+Sections:
 
 1. ACCOMMODATION RECOMMENDATIONS
    - Recommend specific areas to stay based on their preferences
@@ -199,11 +222,16 @@ Please be specific, practical, and realistic. Include actual costs where relevan
 - Region: {country_data.get('region', 'N/A')}
 - Timezone: {country_data.get('timezone', 'N/A')}"""
 
-    def _get_power_adapter_info(self, country_data, response_text):
+    def _get_power_adapter_info(self, country_data, response_text, destination_fallback=None):
         """Extract power adapter info and provide helpful URL"""
 
         # Build country-specific URL
         country_name = country_data.get('name', '') if country_data else ''
+
+        # Fallback: derive country from destination string
+        # "Paris, France" -> "France"; "Singapore" -> "Singapore"
+        if not country_name and destination_fallback:
+            country_name = destination_fallback.split(',')[-1].strip()
 
         logger.info(f"Building power adapter URL - Country data: {country_data}")
         logger.info(f"Country name extracted: '{country_name}'")
@@ -213,6 +241,8 @@ Please be specific, practical, and realistic. Include actual costs where relevan
             country_slug = country_name.lower().replace(' ', '-')
             # Remove special characters
             country_slug = ''.join(c if c.isalnum() or c == '-' else '' for c in country_slug)
+            # Normalize to the slug worldstandards.eu actually uses
+            country_slug = _POWER_PLUG_SLUG_ALIASES.get(country_slug, country_slug)
             info_url = f'https://www.worldstandards.eu/electricity/plug-voltage-by-country/{country_slug}/'
             logger.info(f"Generated country-specific URL: {info_url}")
         else:

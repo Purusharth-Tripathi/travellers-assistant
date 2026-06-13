@@ -16,7 +16,6 @@ class Config:
     
     # API Keys
     ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
     OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
     EXCHANGE_RATE_API_KEY = os.getenv('EXCHANGE_RATE_API_KEY')
     GOOGLE_PLACES_API_KEY = os.getenv('GOOGLE_PLACES_API_KEY')
